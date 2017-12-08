@@ -8,9 +8,9 @@ containers: [
 volumes: [hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock')]
 ) {
     node('default') {
-
+        def currentCommitHash = "${env.GIT_COMMIT}"
         def gcloud_project = "sharktopus-148619"
-        def releaseTag = "test_app:${env.BRANCH_NAME}.${env.BUILD_NUMBER}"
+        def releaseTag = "test_app:${currentCommitHash}.${env.BUILD_NUMBER}"
         def dockerRepo = "gcr.io/${gcloud_project}/"
         def repoTag = "${dockerRepo}${releaseTag}"
 
