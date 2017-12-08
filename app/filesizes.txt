@@ -1,0 +1,4 @@
+good_dockerfile               115.3 MB
+good_with_separate_del        278.5 MB
+bad_dockerfile                280.2 MB
+bad_dockerfile_separate_del   280.6 MB
