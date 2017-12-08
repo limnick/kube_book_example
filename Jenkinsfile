@@ -15,6 +15,8 @@ volumes: [hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/
         def repoTag = "${dockerRepo}${releaseTag}"
 
         stage('checkout') {
+            sh("env")
+
             checkout scm
             println "checkout successful"
         }
