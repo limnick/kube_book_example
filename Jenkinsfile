@@ -9,6 +9,11 @@ volumes: [hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/
 ) {
     node('default') {
 
+        def gcloud_project = "sharktopus-148619"
+        def releaseTag = "test_app:${env.BRANCH_NAME}.${env.BUILD_NUMBER}"
+        def dockerRepo = "gcr.io/${gcloud_project}/"
+        def repoTag = "${dockerRepo}${releaseTag}"
+
         stage('checkout') {
             checkout scm
             println "checkout successful"
@@ -16,13 +21,20 @@ volumes: [hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/
 
         stage('build') {
             container('docker') {
-                sh("cd app && ./build.sh good")
+                sh("cd app && docker build -f good.Dockerfile -t ${releaseTag} .")
             }
         }
 
-        stage('test') {}
+        stage('test') {
+
+        }
 
         stage('deploy') {
+            container('docker') {
+                sh("docker tag ${releaseTag} ${repoTag}")
+                sh("docker push ${repoTag}")
+            }
+
             container('helm') {
                 sh("helm list")
             }
