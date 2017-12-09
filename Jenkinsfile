@@ -6,7 +6,8 @@ containers: [
     containerTemplate(name: 'helm', image: 'lachlanevenson/k8s-helm', command: 'cat', args: '', ttyEnabled: true, resourceRequestCpu: '25m'),
 ],
 volumes: [
-    hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock')
+    hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock'),
+    secretVolume(secretName: 'jenkins-gcr-keys', mountPath: '/repo_keys'),
 ],
 nodeSelector: 'jenk=true') {
     node('default') {
@@ -25,6 +26,7 @@ nodeSelector: 'jenk=true') {
 
         stage('build') {
             container('docker') {
+                sh("docker login -u _json_key -p "$(cat /repo_keys/deploy.json)" https://gcr.io")
                 sh("cd app && docker build -f good.Dockerfile -t ${releaseTag} .")
             }
         }
