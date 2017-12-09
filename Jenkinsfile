@@ -2,8 +2,8 @@
 
 podTemplate(label: 'default',
 containers: [
-    containerTemplate(name: 'docker', image: 'docker', command: '/bin/cat', ttyEnabled: true, resourceRequestCpu: '25m'),
-    containerTemplate(name: 'helm', image: 'lachlanevenson/k8s-helm', command: '/bin/cat', ttyEnabled: true, resourceRequestCpu: '25m'),
+    containerTemplate(name: 'docker', image: 'docker', command: 'cat', args: '', ttyEnabled: true, resourceRequestCpu: '25m'),
+    containerTemplate(name: 'helm', image: 'lachlanevenson/k8s-helm', command: 'cat', args: '', ttyEnabled: true, resourceRequestCpu: '25m'),
 ],
 volumes: [
     hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock')
