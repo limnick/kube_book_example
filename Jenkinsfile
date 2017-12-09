@@ -7,7 +7,8 @@ containers: [
 ],
 volumes: [
     hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock')
-]) {
+],
+nodeSelector: 'jenk=true') {
     node('default') {
         def currentCommitHash = ""
 
