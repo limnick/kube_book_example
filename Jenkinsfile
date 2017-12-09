@@ -28,7 +28,6 @@ nodeSelector: 'jenk=true') {
 
         stage('build') {
             container('docker') {
-                sh("docker login -u _json_key -p '${gcr_cred}' https://gcr.io")
                 sh("cd app && docker build -f good.Dockerfile -t ${releaseTag} .")
             }
         }
@@ -40,6 +39,7 @@ nodeSelector: 'jenk=true') {
         stage('deploy') {
             container('docker') {
                 sh("docker tag ${releaseTag} ${repoTag}")
+                sh("docker login -u _json_key -p '${gcr_cred}' https://gcr.io")
                 sh("docker push ${repoTag}")
             }
 
