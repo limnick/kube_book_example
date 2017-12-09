@@ -26,7 +26,7 @@ nodeSelector: 'jenk=true') {
 
         stage('build') {
             container('docker') {
-                sh("docker login -u _json_key -p "$(cat /repo_keys/deploy.json)" https://gcr.io")
+                sh("docker login -u _json_key -p \"$(cat /repo_keys/deploy.json)\" https://gcr.io")
                 sh("cd app && docker build -f good.Dockerfile -t ${releaseTag} .")
             }
         }
