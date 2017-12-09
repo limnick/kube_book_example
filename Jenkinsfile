@@ -24,9 +24,11 @@ nodeSelector: 'jenk=true') {
         def dockerRepo = "gcr.io/${gcloud_project}/"
         def repoTag = "${dockerRepo}${releaseTag}"
 
+        def gcr_cred = readFile('/repo_keys/deploy.json')
+
         stage('build') {
             container('docker') {
-                sh("docker login -u _json_key -p \"\$(cat /repo_keys/deploy.json)\" https://gcr.io")
+                sh("docker login -u _json_key -p '${gcr_cred}' https://gcr.io")
                 sh("cd app && docker build -f good.Dockerfile -t ${releaseTag} .")
             }
         }
