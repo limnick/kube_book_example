@@ -52,7 +52,7 @@ nodeSelector: 'jenk=true') {
             }
 
             container('helm') {
-                sh("helm upgrade --install --set image.repository=${dockerRepo}/${containerName},image.tag=${releaseVersion} ${helmReleaseName} ${helmChartPath}")
+                sh("helm upgrade --install --set image.repository=${dockerRepo}${containerName},image.tag=${releaseVersion} ${helmReleaseName} ${helmChartPath}")
             }
         }
 

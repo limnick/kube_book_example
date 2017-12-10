@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "demo-app.configmap" . }}
+data:
+  GOOGLE_APPLICATION_CREDENTIALS: /keys/{{ .Values.gcloudKeyName }}
+  GCLOUD_STORAGE_BUCKET_TARGET: {{ .Values.gcloudBucketName }}

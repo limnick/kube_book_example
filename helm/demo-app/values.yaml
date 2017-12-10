@@ -1,0 +1,20 @@
+# Default values for demo-app.
+replicaCount: 2
+revisionHistoryLimit: 5
+envName: prod
+image:
+  repository: docker.io/limnick/gcloud_storage_list_example
+  tag: latest
+  pullPolicy: Always
+gcloudKeySecretName: demo-app-gcs-keys
+gcloudKeyName: storage-reader-key.json
+gcloudBucketName: my-gcloud-storage-bucket
+service:
+  name: demo-app
+  type: LoadBalancer
+  externalPort: 80
+  internalPort: 8888
+resources:
+  requests:
+    cpu: 10m
+    memory: 128Mi

@@ -1,0 +1,62 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ template "demo-app.fullname" . }}
+  labels:
+    app: {{ template "demo-app.name" . }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    env: {{ .Values.envName }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  revisionHistoryLimit: {{ .Values.revisionHistoryLimit }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "demo-app.name" . }}
+        release: {{ .Release.Name }}
+        env: {{ .Values.envName }}
+    spec:
+      containers:
+        - name: app
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          volumeMounts:
+          - name: gcs-keys
+            mountPath: /keys
+            readOnly: true
+          ports:
+            - containerPort: {{ .Values.service.internalPort }}
+          livenessProbe:
+            httpGet:
+              path: /
+              port: {{ .Values.service.internalPort }}
+            periodSeconds: 10
+            timeoutSeconds: 3
+          readinessProbe:
+            httpGet:
+              path: /
+              port: {{ .Values.service.internalPort }}
+            periodSeconds: 10
+            timeoutSeconds: 3
+          env:
+          - name: GOOGLE_APPLICATION_CREDENTIALS
+            valueFrom:
+              configMapKeyRef:
+                name: {{ template "demo-app.configmap" . }}
+                key: GOOGLE_APPLICATION_CREDENTIALS
+          - name: GCLOUD_STORAGE_BUCKET_TARGET
+            valueFrom:
+              configMapKeyRef:
+                name: {{ template "demo-app.configmap" . }}
+                key: GCLOUD_STORAGE_BUCKET_TARGET
+          resources:
+{{ toYaml .Values.resources | indent 12 }}
+      volumes:
+      - name: gcs-keys
+        secret:
+          secretName: "{{ .Values.gcloudKeySecretName }}"
+          items:
+          - key: "{{ .Values.gcloudKeyName }}"
+            path: "{{ .Values.gcloudKeyName }}"
