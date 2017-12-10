@@ -12,6 +12,9 @@ volumes: [
 nodeSelector: 'jenk=true') {
     node('default') {
         def currentCommitHash = ""
+        def pwd = pwd()
+        def helmChartPath = "${pwd}/helm/demo-app"
+        def helmReleaseName = "demo-app-jenk"
 
         stage('checkout') {
             scm_vars = checkout scm
@@ -20,7 +23,9 @@ nodeSelector: 'jenk=true') {
         }
 
         def gcloud_project = "sharktopus-148619"
-        def releaseTag = "test_app:${currentCommitHash}.${env.BUILD_NUMBER}"
+        def containerName = "test_app"
+        def releaseVersion = "${currentCommitHash}.${env.BUILD_NUMBER}"
+        def releaseTag = "${containerName}:${releaseVersion}"
         def dockerRepo = "gcr.io/${gcloud_project}/"
         def repoTag = "${dockerRepo}${releaseTag}"
 
@@ -33,7 +38,10 @@ nodeSelector: 'jenk=true') {
         }
 
         stage('test') {
-
+            container('docker') {
+                // test command goes here
+                sh("docker run ${releaseTag} echo 'OK'")
+            }
         }
 
         stage('deploy') {
@@ -44,7 +52,7 @@ nodeSelector: 'jenk=true') {
             }
 
             container('helm') {
-                sh("helm list")
+                sh("helm upgrade --install --set image.repository=${dockerRepo}/${containerName},image.tag=${releaseVersion} ${helmReleaseName} ${helmChartPath}")
             }
         }
 
