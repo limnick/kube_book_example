@@ -13,7 +13,7 @@ nodeSelector: 'jenk=true') {
     node('default') {
         def currentCommitHash = ""
         def pwd = pwd()
-        def helmChartPath = "${pwd}/helm/demo-app"
+        def helmChartPath = "helm/demo-app"
         def helmReleaseName = "demo-app-jenk"
 
         stage('checkout') {
