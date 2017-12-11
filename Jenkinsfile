@@ -14,6 +14,9 @@ nodeSelector: 'jenk=true') {
         def currentCommitHash = ""
         def helmChartPath = "helm/demo-app"
         def helmReleaseName = "demo-app-jenk"
+        def gcloud_project = "sharktopus-148619"
+        def containerName = "test_app"
+        def gcr_cred = readFile('/repo_keys/deploy.json')
 
         stage('checkout') {
             scm_vars = checkout scm
@@ -21,14 +24,10 @@ nodeSelector: 'jenk=true') {
             currentCommitHash = "${scm_vars.GIT_COMMIT}"
         }
 
-        def gcloud_project = "sharktopus-148619"
-        def containerName = "test_app"
         def releaseVersion = "${currentCommitHash}.${env.BUILD_NUMBER}"
         def releaseTag = "${containerName}:${releaseVersion}"
         def dockerRepo = "gcr.io/${gcloud_project}/"
         def repoTag = "${dockerRepo}${releaseTag}"
-
-        def gcr_cred = readFile('/repo_keys/deploy.json')
 
         stage('build') {
             container('docker') {
@@ -42,17 +41,18 @@ nodeSelector: 'jenk=true') {
             }
         }
 
-        stage('deploy') {
+        stage('push') {
             container('docker') {
                 sh("docker tag ${releaseTag} ${repoTag}")
                 sh("docker login -u _json_key -p '${gcr_cred}' https://gcr.io")
                 sh("docker push ${repoTag}")
             }
+        }
 
+        stage('deploy') {
             container('helm') {
                 sh("helm upgrade --install --set image.repository=${dockerRepo}${containerName},image.tag=${releaseVersion} ${helmReleaseName} ${helmChartPath}")
             }
         }
-
     }
 }
