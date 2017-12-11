@@ -9,10 +9,9 @@ volumes: [
     hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock'),
     secretVolume(secretName: 'jenkins-gcr-keys', mountPath: '/repo_keys'),
 ],
-nodeSelector: 'jenk=true') {
+nodeSelector: 'jenk=true,foo=bar') {
     node('default') {
         def currentCommitHash = ""
-        def pwd = pwd()
         def helmChartPath = "helm/demo-app"
         def helmReleaseName = "demo-app-jenk"
 
@@ -39,7 +38,6 @@ nodeSelector: 'jenk=true') {
 
         stage('test') {
             container('docker') {
-                // test command goes here
                 sh("docker run ${releaseTag} echo 'OK'")
             }
         }
