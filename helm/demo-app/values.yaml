@@ -7,8 +7,8 @@ image:
   tag: latest
   pullPolicy: Always
 gcloudKeySecretName: demo-app-gcs-keys
-gcloudKeyName: storage-reader-key.json
-gcloudBucketName: my-gcloud-storage-bucket
+gcloudKeyName: storage-reader-sharktopus.json
+gcloudBucketName: pennybags-tls
 service:
   name: demo-app
   type: LoadBalancer
