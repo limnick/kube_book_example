@@ -9,7 +9,7 @@ volumes: [
     hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock'),
     secretVolume(secretName: 'jenkins-gcr-keys', mountPath: '/repo_keys'),
 ],
-nodeSelector: 'jenk=true,foo=bar') {
+nodeSelector: 'jenk=true') {
     node('default') {
         def currentCommitHash = ""
         def helmChartPath = "helm/demo-app"
