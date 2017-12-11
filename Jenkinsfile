@@ -44,7 +44,8 @@ nodeSelector: 'jenk=true') {
         stage('push') {
             container('docker') {
                 sh("docker tag ${releaseTag} ${repoTag}")
-                sh("docker login -u _json_key -p '${gcr_cred}' https://gcr.io")
+                println "executing docker login"
+                sh("set +x && docker login -u _json_key -p '${gcr_cred}' https://gcr.io")
                 sh("docker push ${repoTag}")
             }
         }
