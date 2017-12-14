@@ -51,8 +51,11 @@ nodeSelector: 'jenk=true') {
             currentCommitHash = "${scm_vars.GIT_COMMIT}"
 
             def inputFile = readFile('jenkins_branches.json')
+            println "input json: ${inputFile}"
             config = new groovy.json.JsonSlurperClassic().parseText(inputFile)
+            println "config: ${config}"
         }
+        println "config: ${config}"
 
         def releaseVersion = "${currentCommitHash}.${env.BUILD_NUMBER}"
         def releaseTag = "${containerName}:${releaseVersion}"
