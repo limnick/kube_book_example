@@ -3,6 +3,7 @@
 @NonCPS def entries(m) {m.collect {k, v -> [k, v]}}
 
 def helmDeploy(Map args) {
+    println "Running helm deployment, current branch: ${args.branch_name}"
     def sites = entries(args.sites)
 
     for ( int i = 0; i < sites.size(); i++ ) {
@@ -10,11 +11,13 @@ def helmDeploy(Map args) {
         def sitename = site[0]
         def sitemap = site[1]
 
+        println "checking ${sitename}: ${sitemap.branch}"
         if (sitemap.branch == args.branch_name) {
+            println "match, deploying"
+
             def site_name = "${args.name}-${sitename}"
             def install_args = "--install --set image.repository=${args.repository},image.tag=${args.tag} --namespace=${sitemap.namespace} ${site_name} ${args.chart_path}"
 
-            println "Running deployment"
             sh "helm upgrade ${install_args}"
 
             println "Chart instance ${site_name} successfully deployed into ${sitemap.namespace}. Use helm status ${site_name} to check"
