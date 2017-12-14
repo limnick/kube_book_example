@@ -4,24 +4,23 @@
 
 def helmDeploy(Map args) {
     println "Running helm deployment, current branch: ${args.branch_name}"
-    def sites = entries(args.sites)
-    println "sites: ${sites}"
+    def envs = entries(args.envs)
 
-    for ( int i = 0; i < sites.size(); i++ ) {
-        def site = sites.get(i)
-        def sitename = site[0]
-        def sitemap = site[1]
+    for ( int i = 0; i < envs.size(); i++ ) {
+        def env = envs.get(i)
+        def envname = env[0]
+        def envmap = env[1]
 
-        println "checking ${sitename}: ${sitemap.branch}"
-        if (sitemap.branch == args.branch_name) {
+        println "checking ${envname}: ${envmap.branch}"
+        if (envmap.branch == args.branch_name) {
             println "match, deploying"
 
-            def site_name = "${args.name}-${sitename}"
-            def install_args = "--install --set image.repository=${args.repository},image.tag=${args.tag} --namespace=${sitemap.namespace} ${site_name} ${args.chart_path}"
+            def env_name = "${args.name}-${envname}"
+            def install_args = "--install --set image.repository=${args.repository},image.tag=${args.tag} --namespace=${envmap.namespace} ${env_name} ${args.chart_path}"
 
             sh "helm upgrade ${install_args}"
 
-            println "Chart instance ${site_name} successfully deployed into ${sitemap.namespace}. Use helm status ${site_name} to check"
+            println "Chart instance ${env_name} successfully deployed into ${envmap.namespace}. Use helm status ${env_name} to check"
         }
     }
 }
@@ -51,11 +50,8 @@ nodeSelector: 'jenk=true') {
             currentCommitHash = "${scm_vars.GIT_COMMIT}"
 
             def inputFile = readFile('jenkins_branches.json')
-            println "input json: ${inputFile}"
             config = new groovy.json.JsonSlurperClassic().parseText(inputFile)
-            println "config: ${config}"
         }
-        println "config: ${config}"
 
         def releaseVersion = "${currentCommitHash}.${env.BUILD_NUMBER}"
         def releaseTag = "${containerName}:${releaseVersion}"
@@ -85,14 +81,13 @@ nodeSelector: 'jenk=true') {
 
         stage('deploy') {
             container('helm') {
-                println "config.sites: ${config.sites}"
                 helmDeploy(
                     name: helmReleaseName,
                     branch_name: env.BRANCH_NAME,
                     repository: "${dockerRepo}${containerName}",
                     tag: releaseVersion,
                     chart_path: helmChartPath,
-                    sites: config.sites
+                    envs: config.envs
                 )
             }
         }
