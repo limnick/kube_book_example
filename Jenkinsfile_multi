@@ -1,5 +1,27 @@
 #!/usr/bin/env groovy
 
+@NonCPS def entries(m) {m.collect {k, v -> [k, v]}}
+
+def helmDeploy(Map args) {
+    def sites = entries(args.sites)
+
+    for ( int i = 0; i < sites.size(); i++ ) {
+        def site = sites.get(i)
+        def sitename = site[0]
+        def sitemap = site[1]
+
+        if (sitemap.branch == args.branch_name) {
+            def site_name = "${args.name}-${sitename}"
+            def install_args = "--install --set image.repository=${args.repository},image.tag=${args.tag} --namespace=${sitemap.namespace} ${site_name} ${args.chart_path}"
+
+            println "Running deployment"
+            sh "helm upgrade ${install_args}"
+
+            println "Chart instance ${site_name} successfully deployed into ${sitemap.namespace}. Use helm status ${site_name} to check"
+        }
+    }
+}
+
 podTemplate(label: 'default',
 containers: [
     containerTemplate(name: 'docker', image: 'docker', command: 'cat', args: '', ttyEnabled: true, resourceRequestCpu: '25m'),
@@ -52,7 +74,13 @@ nodeSelector: 'jenk=true') {
 
         stage('deploy') {
             container('helm') {
-                sh("helm upgrade --install --set image.repository=${dockerRepo}${containerName},image.tag=${releaseVersion} ${helmReleaseName} ${helmChartPath}")
+                helmDeploy(
+                    name: helmReleaseName,
+                    branch_name: env.BRANCH_NAME,
+                    repository: "${dockerRepo}${containerName}",
+                    tag: releaseVersion,
+                    chart_path: helmChartPath
+                )
             }
         }
     }

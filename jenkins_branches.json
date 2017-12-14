@@ -1,0 +1,12 @@
+{
+  "envs": {
+    "staging": {
+      "namespace": "default",
+      "branch": "master"
+    },
+    "prod": {
+      "namespace": "default",
+      "branch": "prod"
+    }
+  }
+}
