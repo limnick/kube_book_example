@@ -39,11 +39,15 @@ nodeSelector: 'jenk=true') {
         def gcloud_project = "sharktopus-148619"
         def containerName = "test_app"
         def gcr_cred = readFile('/repo_keys/deploy.json')
+        def config = null
 
         stage('checkout') {
             scm_vars = checkout scm
             println "checkout successful"
             currentCommitHash = "${scm_vars.GIT_COMMIT}"
+
+            def inputFile = readFile('jenkins_branches.json')
+            config = new groovy.json.JsonSlurperClassic().parseText(inputFile)
         }
 
         def releaseVersion = "${currentCommitHash}.${env.BUILD_NUMBER}"
@@ -79,7 +83,8 @@ nodeSelector: 'jenk=true') {
                     branch_name: env.BRANCH_NAME,
                     repository: "${dockerRepo}${containerName}",
                     tag: releaseVersion,
-                    chart_path: helmChartPath
+                    chart_path: helmChartPath,
+                    sites: config.sites
                 )
             }
         }
