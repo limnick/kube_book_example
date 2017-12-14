@@ -11,10 +11,8 @@ def helmDeploy(Map args) {
         def envname = env[0]
         def envmap = env[1]
 
-        println "checking ${envname}: ${envmap.branch}"
         if (envmap.branch == args.branch_name) {
-            println "match, deploying"
-
+            println "branch match found for env ${envname} and branch ${envmap.branch}"
             def env_name = "${args.name}-${envname}"
             def install_args = "--install --set image.repository=${args.repository},image.tag=${args.tag} --namespace=${envmap.namespace} ${env_name} ${args.chart_path}"
 
