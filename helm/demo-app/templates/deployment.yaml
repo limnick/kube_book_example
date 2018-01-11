@@ -52,7 +52,7 @@ spec:
                 name: {{ template "demo-app.configmap" . }}
                 key: GCLOUD_STORAGE_BUCKET_TARGET
           resources:
-{{ toYaml .Values.resources | indent 12 }}
+{{ toYaml .Values.resources | trim | indent 12 }}
       volumes:
       - name: gcs-keys
         secret:
