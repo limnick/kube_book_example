@@ -1,0 +1,69 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ template "demo-app.fullname" . }}-migrate
+  labels:
+    app: {{ template "demo-app.name" . }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    env: {{ .Values.envName }}
+  annotations:
+    "helm.sh/hook": post-upgrade
+    "helm.sh/hook-delete-policy": hook-succeeded
+spec:
+  backoffLimit: 1
+  activeDeadlineSeconds: 120
+  template:
+    metadata:
+      name: {{ template "demo-app.fullname" . }}-migrate
+      labels:
+        app: {{ template "demo-app.name" . }}
+        release: {{ .Release.Name }}
+        heritage: {{ .Release.Service }}
+        env: {{ .Values.envName }}
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: app
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        command: ["/bin/sh", "-c", "echo migrating && sleep 30 && echo migration complete"]
+        volumeMounts:
+        - name: gcs-keys
+          mountPath: /keys
+          readOnly: true
+        ports:
+          - containerPort: {{ .Values.service.internalPort }}
+        livenessProbe:
+          httpGet:
+            path: /
+            port: {{ .Values.service.internalPort }}
+          periodSeconds: 10
+          timeoutSeconds: 3
+        readinessProbe:
+          httpGet:
+            path: /
+            port: {{ .Values.service.internalPort }}
+          periodSeconds: 10
+          timeoutSeconds: 3
+        env:
+        - name: GOOGLE_APPLICATION_CREDENTIALS
+          valueFrom:
+            configMapKeyRef:
+              name: {{ template "demo-app.configmap" . }}
+              key: GOOGLE_APPLICATION_CREDENTIALS
+        - name: GCLOUD_STORAGE_BUCKET_TARGET
+          valueFrom:
+            configMapKeyRef:
+              name: {{ template "demo-app.configmap" . }}
+              key: GCLOUD_STORAGE_BUCKET_TARGET
+        resources:
+{{ toYaml .Values.resources | trim | indent 10 }}
+      volumes:
+      - name: gcs-keys
+        secret:
+          secretName: "{{ .Values.gcloudKeySecretName }}"
+          items:
+          - key: "{{ .Values.gcloudKeyName }}"
+            path: "{{ .Values.gcloudKeyName }}"
