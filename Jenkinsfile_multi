@@ -24,6 +24,8 @@ def helmDeploy(Map args) {
 }
 
 podTemplate(label: 'default',
+slaveConnectTimeout: 120,
+activeDeadlineSeconds: 300,
 containers: [
     containerTemplate(name: 'docker', image: 'docker', command: 'cat', args: '', ttyEnabled: true, resourceRequestCpu: '25m'),
     containerTemplate(name: 'helm', image: 'lachlanevenson/k8s-helm', command: 'cat', args: '', ttyEnabled: true, resourceRequestCpu: '25m'),
