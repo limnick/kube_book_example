@@ -7,6 +7,10 @@
     "prod": {
       "namespace": "default",
       "branch": "prod"
+    },
+    "simple_migration": {
+      "namespace": "cookbook",
+      "branch": "simple_migration"
     }
   }
 }
