@@ -1,11 +1,11 @@
 {
   "envs": {
     "staging": {
-      "namespace": "default",
+      "namespace": "cookbook",
       "branch": "master"
     },
     "prod": {
-      "namespace": "default",
+      "namespace": "cookbook",
       "branch": "prod"
     },
     "simple-migration": {
