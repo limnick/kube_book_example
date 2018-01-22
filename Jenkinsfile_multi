@@ -89,5 +89,16 @@ volumes: [
                 )
             }
         }
+
+        stage('test deploy') {
+            // TODO: gross sleep for now, replace with real service check
+            sh('sleep 30 && export SVC_IP=$(kubectl -n cookbook get svc demo-app-jenk-staging-demo-app --template "{{ range (index .status.loadBalancer.ingress 0) }}{{ . }}{{ end }}") && wget -q -O - http://$SVC_IP | grep 'archive/' -q')
+        }
+
+        // stage('clean up deploy') {
+        //     container('helm') {
+                
+        //     }
+        // }
     }
 }
