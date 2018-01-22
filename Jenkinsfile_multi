@@ -49,7 +49,6 @@ def testDeploy(Map args) {
 
         if (envmap.branch == args.branch_name) {
             def env_name = "${args.name}-${envname}"
-            sh "helm delete --purge ${env_name}"
             sh('sleep 30 && export SVC_IP=$(kubectl -n cookbook get svc ${env_name} --template "{{ range (index .status.loadBalancer.ingress 0) }}{{ . }}{{ end }}") && wget -q -O - http://$SVC_IP | grep "archive/" -q')
         }
     }
