@@ -10,7 +10,7 @@
     },
     "simple_migration": {
       "namespace": "cookbook",
-      "branch": "simple_migration"
+      "branch": "simple-migration"
     }
   }
 }
