@@ -8,7 +8,7 @@
       "namespace": "default",
       "branch": "prod"
     },
-    "simple_migration": {
+    "simple-migration": {
       "namespace": "cookbook",
       "branch": "simple-migration"
     }
