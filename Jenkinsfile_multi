@@ -23,6 +23,22 @@ def helmDeploy(Map args) {
     }
 }
 
+def helmDelete(Map args) {
+    def envs = entries(args.envs)
+
+    for ( int i = 0; i < envs.size(); i++ ) {
+        def env = envs.get(i)
+        def envname = env[0]
+        def envmap = env[1]
+
+        if (envmap.branch == args.branch_name) {
+            def env_name = "${args.name}-${envname}"
+            sh "helm delete --purge ${env_name}"
+            println "Chart instance ${env_name} successfully deleted"
+        }
+    }
+}
+
 podTemplate(label: 'default',
 slaveConnectTimeout: 120,
 containers: [
@@ -98,10 +114,14 @@ volumes: [
             }
         }
 
-        // stage('clean up deploy') {
-        //     container('helm') {
-
-        //     }
-        // }
+        stage('clean up deploy') {
+            container('helm') {
+                helmDelete(
+                    name: helmReleaseName,
+                    branch_name: env.BRANCH_NAME,
+                    envs: config.envs
+                )
+            }
+        }
     }
 }
