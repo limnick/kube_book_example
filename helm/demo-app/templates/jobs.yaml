@@ -28,7 +28,7 @@ spec:
       - name: app
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
-        command: ["/bin/sh", "-c", "echo migrating && sleep 30 && echo migration complete"]
+        command: ["/bin/sh", "-c", "echo migrating && sleep 90 && echo migration complete"]
         volumeMounts:
         - name: gcs-keys
           mountPath: /keys
