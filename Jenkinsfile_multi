@@ -12,7 +12,7 @@ def runForBranch(Map args, Closure func) {
 
         if (envmap.branch == args.branch_name) {
             def env_name = "${args.name}-${envname}"
-            func({env_name: env_name, envmap: envmap})
+            func([env_name: env_name, envmap: envmap])
         }
     }
 }
