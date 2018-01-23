@@ -39,6 +39,21 @@ def helmDelete(Map args) {
     }
 }
 
+def testDeploy(Map args) {
+    def envs = entries(args.envs)
+
+    for ( int i = 0; i < envs.size(); i++ ) {
+        def env = envs.get(i)
+        def envname = env[0]
+        def envmap = env[1]
+
+        if (envmap.branch == args.branch_name) {
+            def env_name = "${args.name}-${envname}"
+            sh("sleep 30 && export SVC_IP=\$(kubectl -n cookbook get svc ${env_name} --template \"{{ range (index .status.loadBalancer.ingress 0) }}{{ . }}{{ end }}\") && wget -q -O - http://\$SVC_IP | grep \"archive/\" -q")
+        }
+    }
+}
+
 podTemplate(label: 'default',
 slaveConnectTimeout: 120,
 containers: [
@@ -110,7 +125,11 @@ volumes: [
         stage('test deploy') {
             container('kubectl') {
                 // TODO: gross sleep for now, replace with real service check
-                sh('sleep 30 && export SVC_IP=$(kubectl -n cookbook get svc demo-app-jenk-staging-demo-app --template "{{ range (index .status.loadBalancer.ingress 0) }}{{ . }}{{ end }}") && wget -q -O - http://$SVC_IP | grep "archive/" -q')
+                testDeploy(
+                    name: helmReleaseName,
+                    branch_name: env.BRANCH_NAME,
+                    envs: config.envs
+                )
             }
         }
 
