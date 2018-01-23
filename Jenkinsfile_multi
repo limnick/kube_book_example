@@ -2,8 +2,7 @@
 
 @NonCPS def entries(m) {m.collect {k, v -> [k, v]}}
 
-def helmDeploy(Map args) {
-    println "Running helm deployment, current branch: ${args.branch_name}"
+def runForBranch(Map args, Closure func) {
     def envs = entries(args.envs)
 
     for ( int i = 0; i < envs.size(); i++ ) {
@@ -12,15 +11,23 @@ def helmDeploy(Map args) {
         def envmap = env[1]
 
         if (envmap.branch == args.branch_name) {
-            println "branch match found for env ${envname} and branch ${envmap.branch}"
             def env_name = "${args.name}-${envname}"
-            def install_args = "--install --set image.repository=${args.repository},image.tag=${args.tag} --namespace=${envmap.namespace} ${env_name} ${args.chart_path}"
-
-            sh "helm upgrade ${install_args}"
-
-            println "Chart instance ${env_name} successfully deployed into ${envmap.namespace}. Use helm status ${env_name} to check"
+            func(env_name)
         }
     }
+}
+
+def helmDeploy(Map args) {
+    println "Running helm deployment, current branch: ${args.branch_name}"
+
+    runForBranch(args, {
+        def env_name = it
+        def install_args = "--install --set image.repository=${args.repository},image.tag=${args.tag} --namespace=${envmap.namespace} ${env_name} ${args.chart_path}"
+
+        sh "helm upgrade ${install_args}"
+
+        println "Chart instance ${env_name} successfully deployed into ${envmap.namespace}. Use helm status ${env_name} to check"
+    })
 }
 
 def helmDelete(Map args) {
