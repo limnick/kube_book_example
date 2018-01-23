@@ -12,7 +12,7 @@ def runForBranch(Map args, Closure func) {
 
         if (envmap.branch == args.branch_name) {
             def env_name = "${args.name}-${envname}"
-            func(env_name)
+            func({env_name: env_name, envmap: envmap})
         }
     }
 }
@@ -21,13 +21,15 @@ def helmDeploy(Map args) {
     println "Running helm deployment, current branch: ${args.branch_name}"
 
     runForBranch(args, {
-        def env_name = it
+        def env_name = it.env_name
+        def envmap = it.envmap
         def install_args = "--install --set image.repository=${args.repository},image.tag=${args.tag} --namespace=${envmap.namespace} ${env_name} ${args.chart_path}"
 
         sh "helm upgrade ${install_args}"
 
-        println "Chart instance ${env_name} successfully deployed. Use helm status ${env_name} to check"
+        println "Chart instance ${env_name} successfully deployed into ${envmap.namespace}. Use helm status ${env_name} to check"
     })
+
 }
 
 def helmDelete(Map args) {
