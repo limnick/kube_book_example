@@ -37,7 +37,7 @@ def helmDelete(Map args) {
         def env_name = it.env_name
         sh "helm delete --purge ${env_name}"
         println "Chart instance ${env_name} successfully deleted"
-    }
+    })
 }
 
 def testDeploy(Map args) {
@@ -46,7 +46,7 @@ def testDeploy(Map args) {
         def envmap = it.envmap
 
         sh("sleep 40 && export SVC_IP=\$(kubectl -n ${envmap.namespace} get svc ${env_name} --template \"{{ range (index .status.loadBalancer.ingress 0) }}{{ . }}{{ end }}\") && wget -q -O - http://\$SVC_IP | grep \"archive/\" -q")
-    }
+    })
 }
 
 podTemplate(label: 'default',
