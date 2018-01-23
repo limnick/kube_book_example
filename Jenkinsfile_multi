@@ -33,33 +33,19 @@ def helmDeploy(Map args) {
 }
 
 def helmDelete(Map args) {
-    def envs = entries(args.envs)
-
-    for ( int i = 0; i < envs.size(); i++ ) {
-        def env = envs.get(i)
-        def envname = env[0]
-        def envmap = env[1]
-
-        if (envmap.branch == args.branch_name) {
-            def env_name = "${args.name}-${envname}"
-            sh "helm delete --purge ${env_name}"
-            println "Chart instance ${env_name} successfully deleted"
-        }
+    runForBranch(args, {
+        def env_name = it.env_name
+        sh "helm delete --purge ${env_name}"
+        println "Chart instance ${env_name} successfully deleted"
     }
 }
 
 def testDeploy(Map args) {
-    def envs = entries(args.envs)
+    runForBranch(args, {
+        def env_name = it.env_name
+        def envmap = it.envmap
 
-    for ( int i = 0; i < envs.size(); i++ ) {
-        def env = envs.get(i)
-        def envname = env[0]
-        def envmap = env[1]
-
-        if (envmap.branch == args.branch_name) {
-            def env_name = "${args.name}-${envname}"
-            sh("sleep 30 && export SVC_IP=\$(kubectl -n cookbook get svc ${env_name} --template \"{{ range (index .status.loadBalancer.ingress 0) }}{{ . }}{{ end }}\") && wget -q -O - http://\$SVC_IP | grep \"archive/\" -q")
-        }
+        sh("sleep 40 && export SVC_IP=\$(kubectl -n ${envmap.namespace} get svc ${env_name} --template \"{{ range (index .status.loadBalancer.ingress 0) }}{{ . }}{{ end }}\") && wget -q -O - http://\$SVC_IP | grep \"archive/\" -q")
     }
 }
 
