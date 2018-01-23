@@ -26,7 +26,7 @@ def helmDeploy(Map args) {
 
         sh "helm upgrade ${install_args}"
 
-        println "Chart instance ${env_name} successfully deployed into ${envmap.namespace}. Use helm status ${env_name} to check"
+        println "Chart instance ${env_name} successfully deployed. Use helm status ${env_name} to check"
     })
 }
 
