@@ -7,6 +7,10 @@
     "prod": {
       "namespace": "cookbook",
       "branch": "prod"
+    },
+    "autoscaling": {
+      "namespace": "cookbook",
+      "branch": "autoscaling"
     }
   }
 }

@@ -1,0 +1,33 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ template "demo-app.fullname" . }}-metrics
+  labels:
+    k8s-app: {{ template "demo-app.fullname" . }}-metrics
+spec:
+  jobLabel: k8s-app
+  selector:
+    matchLabels:
+      app: {{ template "demo-app.name" . }}
+  namespaceSelector:
+    matchNames:
+    - default
+  endpoints:
+  - port: demo-app
+    interval: 30s
+    honorLabels: true
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: {{ template "demo-app.fullname" . }}-prom-rules
+  labels:
+    role: prometheus-rulefiles
+    prometheus: k8s
+data:
+  simple.rules: |-
+    groups:
+    - name: toy_server_requests
+      rules:
+      - record: toy_server_requests_per_minute
+        expr: sum(rate(WithKubeToyServer_requests_total[1m]) * 60) BY (pod)

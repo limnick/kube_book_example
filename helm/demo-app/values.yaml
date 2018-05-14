@@ -4,11 +4,11 @@ revisionHistoryLimit: 5
 envName: prod
 image:
   repository: docker.io/limnick/gcloud_storage_list_example
-  tag: latest
+  tag: 0.2.2
   pullPolicy: Always
 gcloudKeySecretName: demo-app-gcs-keys
 gcloudKeyName: storage-reader-sharktopus.json
-gcloudBucketName: withku.be
+gcloudBucketName: toy-bucket
 service:
   name: demo-app
   type: LoadBalancer
