@@ -1,0 +1,3 @@
+# HELP WithKubeToyServer_requests_total Total number of requests
+# TYPE WithKubeToyServer_requests_total counter
+WithKubeToyServer_requests_total 4

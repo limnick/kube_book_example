@@ -9,8 +9,4 @@ spec:
     name: {{ template "demo-app.fullname" . }}
   minReplicas: 1
   maxReplicas: 3
-  metrics:
-  - type: Pods
-    pods:
-      metricName: WithKubeToyServer_requests
-      targetAverageValue: 1
+  targetCPUUtilizationPercentage: 80
